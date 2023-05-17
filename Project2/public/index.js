@@ -264,7 +264,6 @@ const legendLabels = legendContainer2.selectAll('.legend-label')
   .text(d => d.label);
 
 
-
 // Add axes
 const xAxis = d3.axisBottom(xScale);
 const yAxis = d3.axisLeft(yScale);
