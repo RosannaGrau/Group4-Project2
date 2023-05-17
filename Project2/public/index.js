@@ -63,40 +63,8 @@ function vis1(){
   
   const data = receivedData.map(d => attrs.map(a => d[a]));
   
-  console.log(data)
+ console.log(data)
 
- // normalize the data with different logic which suit the data
-  function normalizeData(data, feature) {
-    if (feature === "maxplayers" || feature === "minplayers") {
-      // normalize the data of players 
-      const maxPlayers = Math.max(...data);
-      return data.map(value => value / maxPlayers);
-    } else if (feature === "maxplaytime" || feature === "minplaytime") {
-      // normalize the data of playing time 
-      const maxTime = Math.max(...data);
-      return data.map(value => value / maxTime);
-    } else if (feature === "rating") {
-      // normalize the data of the rating of the games 
-      const minRating = Math.min(...data);
-      const maxRating = Math.max(...data);
-      return data.map(value => (value - minRating) / (maxRating - minRating));
-    }else if (feature === "minage") {
-      // normalize the min age 
-    const minAge = Math.min(...data);
-    const maxAge = Math.max(...data);
-    return data.map(value => (value - minAge) / (maxAge - minAge));
-    } else if (feature === "rating" || feature === "num_of_rating") {
-      // normalize the rating and the number of ratings 
-      const minValue = Math.min(...data);
-      const maxValue = Math.max(...data);
-      return data.map(value => (value - minValue) / (maxValue - minValue));
-    }else {
-      // other data stay 
-      return data;
-    }
-  }
-  const normalizedData = data.map(values => normalizeData(values))
-  //console.log(normalizedData)
   // Flattens the nested arrays and objects into a single array
   function flattenArray(data) {
   const flattened = [];
@@ -114,12 +82,28 @@ function vis1(){
   return flattened;
 }
 
-   
-// Convert the normalizedData into a matrix for use in the druid.Matrix.from()
-const matrixData = normalizedData.map(values => flattenArray(values));
+// normalize the data 
+const matrixData = data.map(values => flattenArray(values));
 
-console.log(matrixData)
-normalizeMatrix = matrixData
+const columnIndices = [1, 3, 4, 5, 6, 7, 8, 9]; 
+
+for (let colIdx of columnIndices) {
+  const column = matrixData.map(row => row[colIdx]); 
+
+  const columnMax = Math.max(...column);
+  const columnMin = Math.min(...column);
+
+  for (let i = 0; i < matrixData.length; i++) {
+    matrixData[i][colIdx] = (columnMax - matrixData[i][colIdx]) / (columnMax - columnMin);
+  }
+}
+
+// rename the normalized data 
+  const normalizedData = matrixData
+  console.log(normalizedData)
+
+  
+
 
   
 // start the visualisation 1 with LDA  
@@ -184,7 +168,6 @@ const yScale = d3.scaleLinear()
   .range([50, svgHeight - 50]);
 
 // Create bubbles
-// Create bubbles
 bubbleContainer.selectAll('.bubble')
   .data(transformedData_playtime)
   .enter()
@@ -208,6 +191,32 @@ bubbleContainer.selectAll('.bubble')
   .append("title")
   .text((d, i) => `Game ${i+1}\nRank: ${i+1}\nTransformed Coordinates: (${d[0]}, ${d[1]})`);
 
+// Create legend
+const legendContainer = svg.append("g")
+  .attr("class", "legend-container")
+  .attr("transform", `translate(${svgWidth + 15}, ${svgHeight - 550})`);
+
+const legend = legendContainer.selectAll(".legend")
+  .data([...new Set(labels)])
+  .enter()
+  .append("g")
+  .attr("class", "legend")
+  .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+
+// Add colored circles to legend
+legend.append("circle")
+  .attr("cx", 5)
+  .attr("cy", 5)
+  .attr("r", 5)
+  .attr("fill", d => colorScale(d))
+  .attr("opacity", 0.7);
+
+// Add labels to legend
+legend.append("text")
+  .attr("x", 15)
+  .attr("y", 8)
+  .attr("dy", "0.35em")
+  .text(d => d);
 
 // Add axes
 const xAxis = d3.axisBottom(xScale);
