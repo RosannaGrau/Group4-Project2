@@ -105,7 +105,7 @@ for (let colIdx of columnIndices) {
   
 
 
-  
+
 // start the visualisation 1 with LDA  
 
 //get the matrix just about the play time and publish year which we want for the visualisation 
@@ -168,6 +168,9 @@ const yScale = d3.scaleLinear()
   .range([50, svgHeight - 50]);
 
 // Create bubbles
+const year = data.map(row => row[1]);
+console.log(year)
+
 bubbleContainer.selectAll('.bubble')
   .data(transformedData_playtime)
   .enter()
@@ -175,23 +178,23 @@ bubbleContainer.selectAll('.bubble')
   .attr('class', 'bubble')
   .attr("cx", d => xScale(d[0]))
   .attr("cy", d => yScale(d[1]))
-  .attr("r", d => {
-    if (d[2] < 2000) {
+  .attr("r", (d, i) => {
+    if (year[i] < 2000) {
       return 5;
-    } else if (d[2] >= 2000 && d[2] < 2010) {
+    } else if (year[i] >= 2000 && year[i] < 2010) {
       return 7;
-    } else if (d[2] >= 2010 && d[2] < 2016) {
-      return 13;
+    } else if (year[i] >= 2010 && year[i] < 2016) {
+      return 12;
     } else {
       return 17;
     }
-  })
+  }) 
   .attr("fill", (d, i) => colorScale(labels[i])) // Use color scale based on labels
   .attr("opacity", 0.3)
   .append("title")
   .text((d, i) => `Game ${i+1}\nRank: ${i+1}\nTransformed Coordinates: (${d[0]}, ${d[1]})`);
 
-// Create legend
+// Create legend for the colors 
 const legendContainer = svg.append("g")
   .attr("class", "legend-container")
   .attr("transform", `translate(${svgWidth + 15}, ${svgHeight - 550})`);
@@ -217,6 +220,50 @@ legend.append("text")
   .attr("y", 8)
   .attr("dy", "0.35em")
   .text(d => d);
+
+// Define the legend data for the radius size 
+const legendData = [
+  { radius: 3, label: 'Published before 2000' },
+  { radius: 7, label: 'Published between 2000 and 2010' },
+  { radius: 12, label: 'Published between 2010 and 2016' },
+  { radius: 17, label: 'Published after 2016' }
+];
+
+// Calculate the dimensions and positions for the legend
+const legendX = 800;
+const legendY = svgHeight -400;
+const legendSpacing = 35;
+
+// Create the legend container
+const legendContainer2 = svg.append('g')
+  .attr('class', 'legend')
+  .attr('transform', `translate(${legendX}, ${legendY})`);
+
+// Create legend circles
+const legendCircles = legendContainer2.selectAll('.legend-circle')
+  .data(legendData)
+  .enter()
+  .append('circle')
+  .attr('class', 'legend-circle')
+  .attr('cx', 0)
+  .attr('cy', (d, i) => i * legendSpacing)
+  .attr('r', d => d.radius)
+  .style('fill', "none")
+  .style('stroke',"#9370DB");
+
+// Create legend labels
+const legendLabels = legendContainer2.selectAll('.legend-label')
+  .data(legendData)
+  .enter()
+  .append('text')
+  .attr('class', 'legend-label')
+  .attr('x', 20)
+  .attr('y', (d, i) => i * legendSpacing)
+  .attr('dy', '0.35em')
+  .style('font-size', '12px')
+  .text(d => d.label);
+
+
 
 // Add axes
 const xAxis = d3.axisBottom(xScale);
