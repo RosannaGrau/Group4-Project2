@@ -140,13 +140,15 @@ console.log(transformedData_playtime)
 
 // start to do the visualization
 const svgWidth = 800;
-const svgHeight = 600;
-const radius = 5; // Fixed radius for all bubbles
+const svgHeight = 550;
 
 const colorScale = d3.scaleOrdinal()
   .domain([...new Set(labels)]) // Get unique labels
   .range(d3.schemeCategory10); // Use D3.js categorical color scheme
 
+const margin = { top: 20, right: 20, bottom: 50, left: 50 };
+const chartWidth = svgWidth - margin.left - margin.right;
+const chartHeight = svgHeight - margin.top - margin.bottom;
 
 // Create SVG container
 const svg = d3.select("body")
@@ -154,22 +156,60 @@ const svg = d3.select("body")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
-// Create a container for the bubbles
-const bubbleContainer = svg.append("g")
-  .attr("class", "bubble-container");
+const chart = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Set up scales
 const xScale = d3.scaleLinear()
   .domain(d3.extent(transformedData_playtime, d => d[0]))
-  .range([50, svgWidth - 50]);
+  .range([0, chartWidth]);
 
 const yScale = d3.scaleLinear()
   .domain(d3.extent(transformedData_playtime, d => d[1]))
-  .range([50, svgHeight - 50]);
+  .range([chartHeight, 0]);
 
+// Create axes
+const xAxis = d3.axisBottom(xScale);
+const yAxis = d3.axisLeft(yScale);
+
+// Append x-axis
+const xAxisGroup = chart.append("g")
+  .attr("class", "x-axis")
+  .attr("transform", `translate(0, ${chartHeight})`)
+  .call(xAxis);
+
+// Append y-axis
+chart.append("g")
+  .attr("class", "y-axis")
+  .call(yAxis);
+
+// Append x-axis label
+chart.append('text')
+  .attr('class', 'axis-label')
+  .attr('x', chartWidth / 2)
+  .attr('y', chartHeight + margin.bottom - 10)
+  .attr('text-anchor', 'middle')
+  .style('font-family', 'Helvetica')
+  .style('font-size', 12)
+  .text('LDA Reduced Coordinate X');
+
+  // Append y-axis label
+chart.append('text')
+.attr('class', 'axis-label')
+.attr('text-anchor', 'middle')
+.attr('transform', `translate(-30, ${chartHeight / 2})rotate(-90)`)
+.style('font-family', 'Helvetica')
+.style('font-size', 12)
+.text('LDA Reduced Coordinate Y');
+
+
+
+// Create a container for the bubbles
+const bubbleContainer = chart.append("g")
+  .attr("class", "bubble-container")
+  .attr("transform", `translate(0, 0)`);
 // Create bubbles
 const year = data.map(row => row[1]);
-console.log(year)
 
 bubbleContainer.selectAll('.bubble')
   .data(transformedData_playtime)
@@ -194,10 +234,20 @@ bubbleContainer.selectAll('.bubble')
   .append("title")
   .text((d, i) => `Game ${i+1}\nRank: ${i+1}\nTransformed Coordinates: (${d[0]}, ${d[1]})`);
 
+
+// Update the bubble positions based on the scales
+bubbleContainer.selectAll('.bubble')
+  .attr("cx", d => xScale(d[0]))
+  .attr("cy", d => yScale(d[1]));
+
+
+
+
+
 // Create legend for the colors 
 const legendContainer = svg.append("g")
   .attr("class", "legend-container")
-  .attr("transform", `translate(${svgWidth + 15}, ${svgHeight - 550})`);
+  .attr("transform", `translate(${svgWidth + 15}, ${svgHeight - 500})`);
 
 const legend = legendContainer.selectAll(".legend")
   .data([...new Set(labels)])
@@ -230,7 +280,7 @@ const legendData = [
 ];
 
 // Calculate the dimensions and positions for the legend
-const legendX = 800;
+const legendX = svgWidth + 15;
 const legendY = svgHeight -400;
 const legendSpacing = 35;
 
@@ -262,18 +312,5 @@ const legendLabels = legendContainer2.selectAll('.legend-label')
   .attr('dy', '0.35em')
   .style('font-size', '12px')
   .text(d => d.label);
-
-
-// Add axes
-const xAxis = d3.axisBottom(xScale);
-const yAxis = d3.axisLeft(yScale);
-
-svg.append("g")
-  .attr("transform", `translate(0, ${svgHeight - 50})`)
-  .call(xAxis);
-
-svg.append("g")
-  .attr("transform", `translate(50, 0)`)
-  .call(yAxis);
-
 }
+
