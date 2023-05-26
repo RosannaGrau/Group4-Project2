@@ -12,6 +12,8 @@
 
   <script>
 
+
+
     const margin = { top: 10, right: 60, bottom: 20, left: 20 };
 const viewBox = { x: 0, y: 0, w: 1000, h: 600 };
 const width = viewBox.w - margin.left - margin.right;
@@ -24,7 +26,7 @@ const svg = d3.select('#container')
     .attr('height', window.innerHeight - margin.top - margin.bottom)
     .append('g')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)     // mind the margins
-    .attr('color', '#e6e8ea')                                          // font color
+    .attr('color', 'black')                                          // font color
     .attr('font-weight', 'bold')                                       // we are bold enough to do this
     .attr('stroke-width', 2);                                          // and even this
 
@@ -35,7 +37,7 @@ const svg = d3.select('#container')
         .attr('height', window.innerHeight - margin.top - margin.bottom)
 });
 
-document.body.style.background = '#1e1e1e';
+//document.body.style.background = '#1e1e1e';
 
 const xrange = [0, 10];
 const x = d3.scaleLinear()
@@ -70,10 +72,10 @@ const generatePoints = (n) => {     // generate an array of n random points
     return Array.from(Array(n)).map(_ => getRandomPoint());
 }
 
-const numPoints = [[1,0,0,1,0], [0,1,1,1,1], [1,1,0,1,1], [0,0,1,1,0], [1,0,0,0,0], [1,1,1,1,1]]
+//const numPoints = [[1,0,0,1,0], [0,1,1,1,1], [1,1,0,1,1], [0,0,1,1,0], [1,0,0,0,0], [1,1,1,1,1], [1,0,1,0,1], [1,0,0,0,1]]
 
-//const numPoints = 1000;
-const numClusters = 2;
+const numPoints = 5100;
+const numClusters = 3;
 const points = generatePoints(numPoints);
 const centroids = generatePoints(numClusters);
 
@@ -135,10 +137,10 @@ const updateCentroids = () => {
 }
 
 updatePoints();          // assign the initial cluster
-setInterval(() => {
-    updateCentroids();
-    updatePoints();
-}, 1000);               // 1000ms = 1s
+//setInterval(() => {
+  //  updateCentroids();
+   // updatePoints();
+//}, 1000);               // 1000ms = 1s
 
   </script>
 </body>
