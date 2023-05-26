@@ -393,7 +393,7 @@ const generatePoints = (n) => {
     return Array.from(Array(n)).map(_ => getRandomPoint());
 }
 
-const numPoints = gameCategoryArray
+const numPoints = 1000
 
 const numClusters = 3;
 const points = generatePoints(numPoints);
