@@ -335,7 +335,7 @@ for (const game of receivedData) {
 console.log(gameCategoryArray);
   
   
-  const margin = { top: 10, right: 60, bottom: 20, left: 20 };
+  const margin = { top: 160, right: 200, bottom: 20, left: 20 };
 const viewBox = { x: 0, y: 0, w: 1000, h: 600 };
 const width = viewBox.w - margin.left - margin.right;
 const height = viewBox.h - margin.top - margin.bottom;
