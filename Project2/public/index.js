@@ -314,3 +314,24 @@ const legendLabels = legendContainer2.selectAll('.legend-label')
   .text(d => d.label);
 }
 
+
+
+function vis2(){
+  
+const uniqueCategories = [...new Set(receivedData.flatMap(receivedData => receivedData.types.categories.map(category => category.name)))];
+console.log(uniqueCategories);
+const categories = [...new Set(receivedData.flatMap(receivedData => receivedData.types.categories.map(category => category.name)))];
+const gameCategoryArray = [];
+
+for (const game of receivedData) {
+  const categoryArray = [];
+  for (const category of categories) {
+    const containsCategory = game.types.categories.some(cat => cat.name === category);
+    categoryArray.push(containsCategory ? 1 : 0);
+  }
+  gameCategoryArray.push(categoryArray);
+}
+
+console.log(gameCategoryArray);
+}
+
