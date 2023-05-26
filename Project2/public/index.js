@@ -346,34 +346,34 @@ const svg = d3.select('#container')
     .attr('width', window.innerWidth - margin.left - margin.right)
     .attr('height', window.innerHeight - margin.top - margin.bottom)
     .append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)     // mind the margins
-    .attr('color', '#e6e8ea')                                          // font color
-    .attr('font-weight', 'bold')                                       // we are bold enough to do this
-    .attr('stroke-width', 2);                                          // and even this
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)    
+    .attr('color', 'black')                                         
+    .attr('font-weight', 'bold')                                       
+    .attr('stroke-width', 2);                                          
 
-    window.addEventListener('resize', function (event) {    // testers hate this one simple function
+    window.addEventListener('resize', function (event) {   
     d3.select('svg')
         .attr('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`)
         .attr('width', window.innerWidth - margin.left - margin.right)
         .attr('height', window.innerHeight - margin.top - margin.bottom)
 });
 
-document.body.style.background = '#1e1e1e';
+
 
 const xrange = [0, 10];
 const x = d3.scaleLinear()
-    .domain(xrange)         // values from our domain (0 to 10)
-    .range([0, width]);     // will be assigned a valid x coordinate
+    .domain(xrange)         
+    .range([0, width]);     
 
 const yrange = [0, 10];
 const y = d3.scaleLinear()
-    .domain(yrange)         // remember that in SVG the y axis points downwards
-    .range([height, 0]);    // but we want our axis pointing upwards, like a normal damn axis
+    .domain(yrange)         
+    .range([height, 0]);    
 
 const color = d3.scaleOrdinal(d3.schemeCategory10); // 10 different colors for 10 different numbers
 
 svg.append('g')
-    .attr('transform', `translate(0, ${height})`)  // placed at the bottom
+    .attr('transform', `translate(0, ${height})`)  
     .call(d3.axisBottom(x));
 
 svg.append('g')
@@ -389,7 +389,7 @@ svg.append('g')
     return point;
 }
 
-const generatePoints = (n) => {     // generate an array of n random points
+const generatePoints = (n) => {    
     return Array.from(Array(n)).map(_ => getRandomPoint());
 }
 
@@ -399,15 +399,15 @@ const numClusters = 3;
 const points = generatePoints(numPoints);
 const centroids = generatePoints(numClusters);
 
-const pointsSvg = svg.append('g')          // place them in a group, so they don't run away
-    .attr('id', 'points-svg')              // assign them an id, taking away their individuality
+const pointsSvg = svg.append('g')          
+    .attr('id', 'points-svg')              
     .selectAll('dot')
-    .data(points)                          // loop over our data
-    .join('circle')                        // add a circle
-    .attr('cx', d => x(d.x))               // position
+    .data(points)                          
+    .join('circle')                        
+    .attr('cx', d => x(d.x))               
     .attr('cy', d => y(d.y))
-    .attr('r', 4)                          // radius
-    .style('fill', d => color(d.cluster)); // color according to the cluster
+    .attr('r', 4)                          
+    .style('fill', d => color(d.cluster)); 
 
 
 const centroidsSvg = svg.append('g')
@@ -417,18 +417,18 @@ const centroidsSvg = svg.append('g')
     .join('circle')
     .attr('cx', d => x(d.x))
     .attr('cy', d => y(d.y))
-    .attr('r', 5)                       // a bit bigger than data points
-    .style('fill', '#e6e8ea')           // greyish fill
-    .attr('stroke', (d, i) => color(i)) // and a thick colorful outline
+    .attr('r', 5)                       
+    .style('fill', '#e6e8ea')           
+    .attr('stroke', (d, i) => color(i)) 
     .attr('stroke-width', 2);
 
-    const distance = (a, b) => {    // Euclidean distance in 2D
+    const distance = (a, b) => {    
     return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
 
 const closestCentroid = (point) => {
-    const distances = centroids.map(centroid => distance(point, centroid));   // distance to each centroid
-    const i = distances.findIndex(d => d === Math.min(...distances));         // index of the closest centroid
+    const distances = centroids.map(centroid => distance(point, centroid));   
+    const i = distances.findIndex(d => d === Math.min(...distances));         
     return i;
 }
 
@@ -441,26 +441,23 @@ const updatePoints = () => {
         .style('fill', d => color(d.cluster));
 }
 
-const avg = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;      // average of a numeric array
+const avg = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;      
 const updateCentroids = () => {
     centroids.forEach((centroid, i) => {
-        const cluster = points.filter(point => point.cluster === i);   // all points in the cluster
+        const cluster = points.filter(point => point.cluster === i);   
         if (cluster.length > 0) {
-            centroid.x = avg(cluster.map(point => point.x));           // calculate average position
+            centroid.x = avg(cluster.map(point => point.x));          
             centroid.y = avg(cluster.map(point => point.y));
         }
     });
     centroidsSvg.transition()
         .duration(500)
         .attr('cx', d => x(d.x))
-        .attr('cy', d => y(d.y));                                      // update centroid position
+        .attr('cy', d => y(d.y));                                      
 }
 
-updatePoints();          // assign the initial cluster
-setInterval(() => {
-    updateCentroids();
-    updatePoints();
-}, 1000);               // 1000ms = 1s
+updatePoints();          
+
 
 }
 
